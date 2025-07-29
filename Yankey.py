@@ -30,11 +30,17 @@ mainApplicationWindow.resize(1200, 700)
 mainApplicationWindow.setWindowTitle('Yankey Nodle')
 mainApplicationWindow.setWindowIcon(QtGui.QIcon('logo.png'))
 
+viewer = QWidget(mainApplicationWindow)
+viewer.setWindowTitle("License")
+
 def saveNote():
     key = listNotes.selectedItems()[0].text()
-    notes[key] = {"text": noteEdit.toPlainText(), "tags":notes[key]["tags"]}
-    with open("notes.json", "w", encoding="utf-8") as file:
-        json.dump(notes, file, sort_keys=True)
+    try:
+        notes[key] = {"text": noteEdit.toPlainText(), "tags":notes[key]["tags"]}
+        with open("notes.json", "w", encoding="utf-8") as file:
+            json.dump(notes, file, sort_keys=True)
+    except:
+        print("Save failed!")
 
 def newNote():
     name, submit = QInputDialog.getText(mainApplicationWindow, "Create new note", "Enter new note name:")
@@ -49,12 +55,14 @@ def newNote():
         errorDuplicate.setIcon(QMessageBox.Critical)
         errorDuplicate.setStandardButtons(QMessageBox.Ok)
         errorDuplicate.setText('Cannot create new note - note already exists!')
+        errorDuplicate.show()
     else:
         errorEmptyName = QMessageBox(mainApplicationWindow)
         errorEmptyName.setWindowTitle("Error")
         errorEmptyName.setIcon(QMessageBox.Critical)
         errorEmptyName.setStandardButtons(QMessageBox.Ok)
         errorEmptyName.setText('Cannot create new note - note name cannot be empty!')
+        errorEmptyName.show()
 
 def deleteNote():
     if listNotes.selectedItems():
@@ -64,15 +72,43 @@ def deleteNote():
         confirmDelete.setStandardButtons(QMessageBox.Ok)
         confirmDelete.addButton(QMessageBox.Cancel)
         confirmDelete.setText("Are you sure you want to delete this item?\nThe item will be deleted forever! (Forever is a very long time!)")
+        confirmDelete.show()
         if confirmDelete.exec() == QMessageBox.Ok:
-            key = listNotes.selectedItems()[0].text()
-            del notes[key]
-            listNotes.clear()
-            noteEdit.clear()
-            listTags.clear()
-            with open("notes.json", "w", encoding="utf-8") as file:
-                json.dump(notes, file, sort_keys=True)
-                listNotes.addItems(notes.keys())
+            if key != "Demofile" or key != "Tutorial":
+                key = listNotes.selectedItems()[0].text()
+                del notes[key]
+                listNotes.clear()
+                noteEdit.clear()
+                listTags.clear()
+                with open("notes.json", "w", encoding="utf-8") as file:
+                    json.dump(notes, file, sort_keys=True)
+                    listNotes.addItems(notes.keys())
+            else:
+                errorNOCB2 = QMessageBox(mainApplicationWindow)
+                errorNOCB2.setWindowTitle("Error")
+                errorNOCB2.setIcon(QMessageBox.Warning)
+                errorNOCB2.setText("Cannot delete a system note!")
+                errorNOCB2.setStandardButtons(QMessageBox.Ok)
+                errorNOCB2.show()
+
+def readLicense():
+    textArea = QTextEdit()
+    textArea.setReadOnly(True)
+    try:
+        with open("LICENSE", "r", encoding="utf-8") as file:
+            licenseContents = file.read()
+        textArea.setText(licenseContents)
+        viewerLayout = QVBoxLayout()
+        viewerLayout.addWidget(textArea)
+        viewer.show()
+    except:
+        errorLicense = QMessageBox(mainApplicationWindow)
+        errorLicense = QMessageBox(mainApplicationWindow)
+        errorLicense.setWindowTitle("Error")
+        errorLicense.setIcon(QMessageBox.Critical)
+        errorLicense.setText("The license is not found")
+        errorLicense.setStandardButtons(QMessageBox.Abort)
+        errorLicense.show()
 
 listNotesLabel = QLabel('Your notes:')
 listNotes = QListWidget()
@@ -92,6 +128,7 @@ menubar = QMenuBar()
 
 fileMenu = menubar.addMenu("File")
 tagMenu = menubar.addMenu("Tags")
+helpMenu = menubar.addMenu("Help")
 
 newAction = QAction("New", mainApplicationWindow)
 saveAction = QAction("Save", mainApplicationWindow)
@@ -103,11 +140,16 @@ newTagAction = QAction("New Tag", mainApplicationWindow)
 deleteTagAction = QAction("Delete Tag", mainApplicationWindow)
 helpTagAction = QAction("Help", mainApplicationWindow)
 
+aboutAction = QAction("About", mainApplicationWindow)
+licenseAction = QAction("License", mainApplicationWindow)
+
 newAction.triggered.connect(newNote)
 saveAction.triggered.connect(saveNote)
 deleteAction.triggered.connect(deleteNote)
 helpAction.triggered.connect(application.quit)
 exitAction.triggered.connect(application.quit)
+
+licenseAction.triggered.connect(readLicense)
 
 fileMenu.addAction(newAction)
 fileMenu.addAction(saveAction)
@@ -117,6 +159,9 @@ fileMenu.addAction(exitAction)
 
 tagMenu.addAction(newTagAction)
 tagMenu.addAction(deleteTagAction)
+
+helpMenu.addAction(aboutAction)
+helpMenu.addAction(licenseAction)
 
 col1 = QVBoxLayout()
 listLayout = QVBoxLayout()
@@ -164,38 +209,6 @@ def selectNote():
     listTags.clear()
     listTags.addItems(tags)
 
-def saveNote():
-    key = listNotes.selectedItems()[0].text()
-    notes[key] = {"text": noteEdit.toPlainText(), "tags":notes[key]["tags"]}
-    with open("notes.json", "w", encoding="utf-8") as file:
-        json.dump(notes, file, sort_keys=True)
-
-def newNote():
-    name, submit = QInputDialog.getText(mainApplicationWindow, "Create new note", "Enter new note name:")
-    if name != "" and submit:
-        notes[name] = {"text":"", "tags":[]}
-        listNotes.addItem(name)
-        with open("notes.json", "w", encoding="utf-8") as file:
-            json.dump(notes, file, sort_keys=True)
-
-def deleteNote():
-    if listNotes.selectedItems():
-        confirmDelete = QMessageBox(mainApplicationWindow)
-        confirmDelete.setWindowTitle("Confirm Note Deletion")
-        confirmDelete.setIcon(QMessageBox.Warning)
-        confirmDelete.setStandardButtons(QMessageBox.Ok)
-        confirmDelete.addButton(QMessageBox.Cancel)
-        confirmDelete.setText("Are you sure you want to delete this item?\nThe item will be deleted forever! (Forever is a very long time)")
-        if confirmDelete.exec() == QMessageBox.Ok:
-            key = listNotes.selectedItems()[0].text()
-            del notes[key]
-            listNotes.clear()
-            noteEdit.clear()
-            listTags.clear()
-            with open("notes.json", "w", encoding="utf-8") as file:
-                json.dump(notes, file, sort_keys=True)
-                listNotes.addItems(notes)
-
 def searchTag():
     listNotes.clear()
     noteEdit.clear()
@@ -211,6 +224,7 @@ def searchTag():
     else:
         listNotes.addItems(notes)
         searchTagButton.setText("Search note by tag")
+
 
 listNotes.itemClicked.connect(selectNote)
 saveNoteButton.clicked.connect(saveNote)
