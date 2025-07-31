@@ -30,8 +30,8 @@ mainApplicationWindow.resize(1200, 700)
 mainApplicationWindow.setWindowTitle('Yankey Nodle')
 mainApplicationWindow.setWindowIcon(QtGui.QIcon('logo.png'))
 
-viewer = QWidget(mainApplicationWindow)
-viewer.setWindowTitle("License")
+viewer = QWidget()
+viewer.setFixedSize(800, 680)
 
 def saveNote():
     key = listNotes.selectedItems()[0].text()
@@ -91,24 +91,64 @@ def deleteNote():
                 errorNOCB2.setStandardButtons(QMessageBox.Ok)
                 errorNOCB2.show()
 
+def close():
+    viewer.hide()
+
 def readLicense():
     textArea = QTextEdit()
     textArea.setReadOnly(True)
+    viewer.setWindowTitle("License")
     try:
         with open("LICENSE", "r", encoding="utf-8") as file:
             licenseContents = file.read()
-        textArea.setText(licenseContents)
-        viewerLayout = QVBoxLayout()
-        viewerLayout.addWidget(textArea)
-        viewer.show()
+        with open("initial.txt", "r", encoding="utf-8") as file:
+            initialContents = file.read()
+        if licenseContents != initialContents:
+            errorNOCB3 = QMessageBox(mainApplicationWindow)
+            errorNOCB3.setWindowTitle("Error")
+            errorNOCB3.setIcon(QMessageBox.Critical)
+            errorNOCB3.setText("The license has been modified.")
+            errorNOCB3.setStandardButtons(QMessageBox.Abort)
+            errorNOCB3.show()
+        else:
+            textArea.setText(licenseContents)
+            viewerLayout = QVBoxLayout()
+            viewerLayout.addWidget(textArea)
+            viewerButtonLayout = QVBoxLayout()
+            viewerButtonLayout.addStretch(8)
+            understand = QPushButton("I Understand")
+            viewerButtonLayout.addWidget(understand)
+            mainLayout = QHBoxLayout()
+            mainLayout.addLayout(viewerLayout)
+            mainLayout.addLayout(viewerButtonLayout)
+            viewer.setLayout(mainLayout)
+            understand.clicked.connect(close)
+            viewer.show()
     except:
         errorLicense = QMessageBox(mainApplicationWindow)
         errorLicense = QMessageBox(mainApplicationWindow)
         errorLicense.setWindowTitle("Error")
         errorLicense.setIcon(QMessageBox.Critical)
-        errorLicense.setText("The license is not found")
+        errorLicense.setText("The license cannot be read.")
         errorLicense.setStandardButtons(QMessageBox.Abort)
         errorLicense.show()
+
+def readAbout():
+    textArea = QTextEdit()
+    textArea.setReadOnly(True)
+    viewer.setWindowTitle("About")
+    viewerLayout = QVBoxLayout()
+    viewerLayout.addWidget(textArea)
+    viewerButtonLayout = QVBoxLayout()
+    viewerButtonLayout.addStretch(8)
+    understand = QPushButton("I Understand")
+    viewerButtonLayout.addWidget(understand)
+    mainLayout = QHBoxLayout()
+    mainLayout.addLayout(viewerLayout)
+    mainLayout.addLayout(viewerButtonLayout)
+    viewer.setLayout(mainLayout)
+    understand.clicked.connect(close)
+    viewer.show()
 
 listNotesLabel = QLabel('Your notes:')
 listNotes = QListWidget()
