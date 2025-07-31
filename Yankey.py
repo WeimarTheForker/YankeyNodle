@@ -265,7 +265,6 @@ def searchTag():
         listNotes.addItems(notes)
         searchTagButton.setText("Search note by tag")
 
-
 listNotes.itemClicked.connect(selectNote)
 saveNoteButton.clicked.connect(saveNote)
 newNoteButton.clicked.connect(newNote)
