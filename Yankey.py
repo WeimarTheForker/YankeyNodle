@@ -74,29 +74,43 @@ def saveNote():
         with open("notes.json", "w", encoding="utf-8") as file:
             json.dump(notes, file, sort_keys=True)
     except Exception as exception:
-        print(f"Try-catch error when saving note!\n{exception}")
+        errorNOCB5 = QMessageBox(mainApplicationWindow)
+        errorNOCB5.setWindowTitle("Error")
+        errorNOCB5.setIcon(QMessageBox.Critical)
+        errorNOCB5.setText(f"Try-catch error while saving note!\n{exception}")
+        errorNOCB5.setStandardButtons(QMessageBox.Abort)
+        errorNOCB5.show()
 
 def newNote():
-    name, submit = QInputDialog.getText(mainApplicationWindow, "Create new note", "Enter new note name:")
-    if name != "" and submit:
-        notes[name] = {"text":"", "tags":[]}
-        listNotes.addItem(name)
-        with open("notes.json", "w", encoding="utf-8") as file:
-            json.dump(notes, file, sort_keys=True)
-    elif name in notes.keys():
-        errorDuplicate = QMessageBox(mainApplicationWindow)
-        errorDuplicate.setWindowTitle("Error")
-        errorDuplicate.setIcon(QMessageBox.Critical)
-        errorDuplicate.setStandardButtons(QMessageBox.Ok)
-        errorDuplicate.setText('Cannot create new note - note already exists!')
-        errorDuplicate.show()
-    else:
-        errorEmptyName = QMessageBox(mainApplicationWindow)
-        errorEmptyName.setWindowTitle("Error")
-        errorEmptyName.setIcon(QMessageBox.Critical)
-        errorEmptyName.setStandardButtons(QMessageBox.Ok)
-        errorEmptyName.setText('Cannot create new note - note name cannot be empty!')
-        errorEmptyName.show()
+    try:
+        name, submit = QInputDialog.getText(mainApplicationWindow, "Create new note", "Enter new note name:")
+        if name != "" and submit:
+            notes[name] = {"text":"", "tags":[]}
+            listNotes.addItem(name)
+            with open("notes.json", "w", encoding="utf-8") as file:
+                json.dump(notes, file, sort_keys=True)
+        elif name in notes.keys():
+            errorDuplicate = QMessageBox(mainApplicationWindow)
+            errorDuplicate.setWindowTitle("Error")
+            errorDuplicate.setIcon(QMessageBox.Critical)
+            errorDuplicate.setStandardButtons(QMessageBox.Ok)
+            errorDuplicate.setText('Cannot create new note - note already exists!')
+            errorDuplicate.show()
+        else:
+            errorEmptyName = QMessageBox(mainApplicationWindow)
+            errorEmptyName.setWindowTitle("Error")
+            errorEmptyName.setIcon(QMessageBox.Critical)
+            errorEmptyName.setStandardButtons(QMessageBox.Ok)
+            errorEmptyName.setText('Cannot create new note - note name cannot be empty!')
+            errorEmptyName.show()
+    except Exception as exception:
+        errorNOCB5 = QMessageBox(mainApplicationWindow)
+        errorNOCB5.setWindowTitle("Error")
+        errorNOCB5.setIcon(QMessageBox.Critical)
+        errorNOCB5.setText(f"Try-catch error while creating new note!\n{exception}")
+        errorNOCB5.setStandardButtons(QMessageBox.Abort)
+        errorNOCB5.show()
+        
 
 def deleteNote():
     try:
@@ -121,7 +135,7 @@ def deleteNote():
         errorNOCB4 = QMessageBox(mainApplicationWindow)
         errorNOCB4.setWindowTitle("Error")
         errorNOCB4.setIcon(QMessageBox.Critical)
-        errorNOCB4.setText(f"Try-catch error during note deletion!\n{exception}")
+        errorNOCB4.setText(f"Try-catch error while deleting note!\n{exception}")
         errorNOCB4.setStandardButtons(QMessageBox.Abort)
         errorNOCB4.show()
 
