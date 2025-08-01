@@ -156,6 +156,40 @@ def closeAbout():
 def readAbout():
     aboutviewer.show()
 
+def deleteTag():
+    tag = listTags.selectedItems()[0].text()
+    key = listNotes.selectedItems()[0].text()
+    notes[key]["tags"].remove(tag)
+    with open("notes.json", "w", encoding="utf-8") as file:
+        json.dump(notes, file, sort_keys=True)
+    listTags.clear()
+    listTags.addItems(notes[key]["tags"])
+
+def createTag():
+    tag = searchTagLine.text()
+    key = listNotes.selectedItems()[0].text()
+    notes[key]["tags"].append(tag)
+    if tag in notes[key]["tags"]:
+        errorDupeTag = QMessageBox(mainApplicationWindow)
+        errorDupeTag.setWindowTitle("Error")
+        errorDupeTag.setIcon(QMessageBox.Critical)
+        errorDupeTag.setText("Cannot create new tag - tag already exists!")
+        errorDupeTag.setStandardButtons(QMessageBox.Abort)
+        errorDupeTag.show()
+    elif tag == "":
+        errorNameTag = QMessageBox(mainApplicationWindow)
+        errorNameTag.setWindowTitle("Error")
+        errorNameTag.setIcon(QMessageBox.Critical)
+        errorNameTag.setText("Cannot create new tag - tag name cannot be empty!")
+        errorNameTag.setStandardButtons(QMessageBox.Abort)
+        errorNameTag.show()
+    else:
+        with open("notes.json", "w", encoding="utf-8") as file:
+            json.dump(notes, file, sort_keys=True)
+        listTags.clear()
+        listTags.addItems(notes[key]["tags"])
+        searchTagLine.clear()
+
 listNotesLabel = QLabel('Your notes:')
 listNotes = QListWidget()
 newNoteButton = QPushButton('New note')
@@ -194,6 +228,9 @@ saveAction.triggered.connect(saveNote)
 deleteAction.triggered.connect(deleteNote)
 helpAction.triggered.connect(application.quit)
 exitAction.triggered.connect(application.quit)
+
+newTagAction.triggered.connect(createTag)
+deleteTagAction.triggered.connect(deleteTag)
 
 aboutAction.triggered.connect(readAbout)
 licenseAction.triggered.connect(readLicense)
@@ -277,6 +314,8 @@ saveNoteButton.clicked.connect(saveNote)
 newNoteButton.clicked.connect(newNote)
 deleteNoteButton.clicked.connect(deleteNote)
 searchTagButton.clicked.connect(searchTag)
+deleteTagButton.clicked.connect(deleteTag)
+createTagButton.clicked.connect(createTag)
 searchTagLine.setPlaceholderText("Search tag (e. g. 'shopping', 'tutorial', 'important')")
 mainApplicationWindow.show()
 application.exec_()
