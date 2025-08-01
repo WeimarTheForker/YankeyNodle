@@ -1,4 +1,4 @@
-('C:\\Users\\Tortie\\Downloads\\YankeyNodle_Version1_0\\build\\Yankey\\PYZ-00.pyz',
+('C:\\Users\\Tortie\\Downloads\\repos\\YankeyNodle_Version1_0\\build\\Yankey\\PYZ-00.pyz',
  [('PyQt5',
    'C:\\Users\\Tortie\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\PyQt5\\__init__.py',
    'PYMODULE'),
