@@ -20,15 +20,12 @@ import json
 
 with open('notes.json', 'r', encoding='utf-8') as file:
     notes = json.load(file)
-
 with open('notes.json', 'r', encoding='utf-8') as file:
     files = json.load(file)
-
 with open("LICENSE", "r", encoding="utf-8") as file:
-            licenseContents = file.read()
-
+    licenseContents = str(file.read())
 with open("initial.txt", "r", encoding="utf-8") as file:
-    initialContents = file.read()
+    initialContents = str(file.read())
 
 application = QApplication([])
 mainApplicationWindow = QWidget()
@@ -41,7 +38,7 @@ viewer.setFixedSize(800, 680)
 aboutviewer = QWidget()
 aboutviewer.setFixedSize(600, 180)
 
-def close():
+def closeLicense():
     viewer.hide()
 
 textArea = QTextEdit()
@@ -58,7 +55,7 @@ mainLayout = QHBoxLayout()
 mainLayout.addLayout(viewerLayout)
 mainLayout.addLayout(viewerButtonLayout)
 viewer.setLayout(mainLayout)
-understand.clicked.connect(close)
+understand.clicked.connect(closeLicense)
 
 textArea = QLabel()
 textArea.setAlignment(Qt.AlignTop)
@@ -76,8 +73,8 @@ def saveNote():
         notes[key] = {"text": noteEdit.toPlainText(), "tags":notes[key]["tags"]}
         with open("notes.json", "w", encoding="utf-8") as file:
             json.dump(notes, file, sort_keys=True)
-    except:
-        print("Save failed!")
+    except Exception as exception:
+        print(f"Try-catch error when saving note!\n{exception}")
 
 def newNote():
     name, submit = QInputDialog.getText(mainApplicationWindow, "Create new note", "Enter new note name:")
@@ -120,33 +117,27 @@ def deleteNote():
                 with open("notes.json", "w", encoding="utf-8") as file:
                     json.dump(notes, file, sort_keys=True)
                     listNotes.addItems(notes.keys())
-    except EOFError as e:
+    except Exception as exception:
         errorNOCB4 = QMessageBox(mainApplicationWindow)
         errorNOCB4.setWindowTitle("Error")
         errorNOCB4.setIcon(QMessageBox.Critical)
-        errorNOCB4.setText(e)
+        errorNOCB4.setText(f"Try-catch error during note deletion!\n{exception}")
         errorNOCB4.setStandardButtons(QMessageBox.Abort)
         errorNOCB4.show()
 
 def readLicense():
-    try:
-        if licenseContents != initialContents:
-            errorNOCB3 = QMessageBox(mainApplicationWindow)
-            errorNOCB3.setWindowTitle("Error")
-            errorNOCB3.setIcon(QMessageBox.Critical)
-            errorNOCB3.setText("The license has been modified.")
-            errorNOCB3.setStandardButtons(QMessageBox.Abort)
-            errorNOCB3.show()
-        else:
-            viewer.show()
-    except:
-        errorLicense = QMessageBox(mainApplicationWindow)
-        errorLicense = QMessageBox(mainApplicationWindow)
-        errorLicense.setWindowTitle("Error")
-        errorLicense.setIcon(QMessageBox.Critical)
-        errorLicense.setText("The license cannot be read.")
-        errorLicense.setStandardButtons(QMessageBox.Abort)
-        errorLicense.show()
+    if initialContents == licenseContents:
+        viewer.show()
+    else:
+        errorNOCB3 = QMessageBox(mainApplicationWindow)
+        errorNOCB3.setWindowTitle("Error")
+        errorNOCB3.setIcon(QMessageBox.Critical)
+        errorNOCB3.setText("The license has been modified.")
+        errorNOCB3.setStandardButtons(QMessageBox.Abort)
+        errorNOCB3.show()
+
+def closeAbout():
+    aboutviewer.hide()
 
 def readAbout():
     aboutviewer.show()
