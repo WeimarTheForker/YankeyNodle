@@ -17,9 +17,10 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5 import QtGui
 import json
-from hashlib import *
+import hashlib
+from hashlib import sha256
 
-licensehash = "230184F60BAE2FEAF244F10A8BAC053C8FF33A183BCC365B4D8B876D2B7F4809"
+checksum = "fbae9aa1ae71700fbddc7f313897161b0941ec24144755143d43138db9a121cb"
 
 with open('notes.json', 'r', encoding='utf-8') as file:
     notes = json.load(file)
@@ -28,10 +29,13 @@ with open('notes.json', 'r', encoding='utf-8') as file:
     files = json.load(file)
 
 with open("LICENSE", "r", encoding="utf-8") as file:
-            licenseContents = file.read()
+    licenseContents = file.read()
 
 with open("initial.txt", "r", encoding="utf-8") as file:
     initialContents = file.read()
+
+currentChecksum = hashlib.sha256(licenseContents.encode()).hexdigest()
+print(currentChecksum)
 
 application = QApplication([])
 mainApplicationWindow = QWidget()
@@ -132,8 +136,8 @@ def deleteNote():
         errorNOCB4.show()
 
 def readLicense():
-    try:
-        if licenseContents != initialContents:
+    try: # License integrity check
+        if checksum != currentChecksum:
             errorNOCB3 = QMessageBox(mainApplicationWindow)
             errorNOCB3.setWindowTitle("Error")
             errorNOCB3.setIcon(QMessageBox.Critical)

@@ -34,7 +34,7 @@ with open("LICENSE", "r", encoding="utf-8") as file:
 with open("initial.txt", "r", encoding="utf-8") as file:
     initialContents = file.read()
 
-currentChecksum = hashlib.sha256(initialContents.encode()).hexdigest()
+currentChecksum = hashlib.sha256(licenseContents.encode()).hexdigest()
 print(currentChecksum)
 
 application = QApplication([])
