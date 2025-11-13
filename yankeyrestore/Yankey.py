@@ -17,6 +17,9 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5 import QtGui
 import json
+from hashlib import *
+
+licensehash = "230184F60BAE2FEAF244F10A8BAC053C8FF33A183BCC365B4D8B876D2B7F4809"
 
 with open('notes.json', 'r', encoding='utf-8') as file:
     notes = json.load(file)

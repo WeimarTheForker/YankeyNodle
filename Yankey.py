@@ -17,15 +17,21 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5 import QtGui
 import json
+from hashlib import *
+
+licensehash = "230184F60BAE2FEAF244F10A8BAC053C8FF33A183BCC365B4D8B876D2B7F4809"
 
 with open('notes.json', 'r', encoding='utf-8') as file:
     notes = json.load(file)
+
 with open('notes.json', 'r', encoding='utf-8') as file:
     files = json.load(file)
+
 with open("LICENSE", "r", encoding="utf-8") as file:
-    licenseContents = str(file.read())
+            licenseContents = file.read()
+
 with open("initial.txt", "r", encoding="utf-8") as file:
-    initialContents = str(file.read())
+    initialContents = file.read()
 
 application = QApplication([])
 mainApplicationWindow = QWidget()
@@ -38,7 +44,7 @@ viewer.setFixedSize(800, 680)
 aboutviewer = QWidget()
 aboutviewer.setFixedSize(600, 180)
 
-def closeLicense():
+def close():
     viewer.hide()
 
 textArea = QTextEdit()
@@ -55,7 +61,7 @@ mainLayout = QHBoxLayout()
 mainLayout.addLayout(viewerLayout)
 mainLayout.addLayout(viewerButtonLayout)
 viewer.setLayout(mainLayout)
-understand.clicked.connect(closeLicense)
+understand.clicked.connect(close)
 
 textArea = QLabel()
 textArea.setAlignment(Qt.AlignTop)
@@ -73,44 +79,30 @@ def saveNote():
         notes[key] = {"text": noteEdit.toPlainText(), "tags":notes[key]["tags"]}
         with open("notes.json", "w", encoding="utf-8") as file:
             json.dump(notes, file, sort_keys=True)
-    except Exception as exception:
-        errorNOCB5 = QMessageBox(mainApplicationWindow)
-        errorNOCB5.setWindowTitle("Error")
-        errorNOCB5.setIcon(QMessageBox.Critical)
-        errorNOCB5.setText(f"Try-catch error while saving note!\n{exception}")
-        errorNOCB5.setStandardButtons(QMessageBox.Abort)
-        errorNOCB5.show()
+    except:
+        print("Save failed!")
 
 def newNote():
-    try:
-        name, submit = QInputDialog.getText(mainApplicationWindow, "Create new note", "Enter new note name:")
-        if name != "" and submit:
-            notes[name] = {"text":"", "tags":[]}
-            listNotes.addItem(name)
-            with open("notes.json", "w", encoding="utf-8") as file:
-                json.dump(notes, file, sort_keys=True)
-        elif name in notes.keys():
-            errorDuplicate = QMessageBox(mainApplicationWindow)
-            errorDuplicate.setWindowTitle("Error")
-            errorDuplicate.setIcon(QMessageBox.Critical)
-            errorDuplicate.setStandardButtons(QMessageBox.Ok)
-            errorDuplicate.setText('Cannot create new note - note already exists!')
-            errorDuplicate.show()
-        else:
-            errorEmptyName = QMessageBox(mainApplicationWindow)
-            errorEmptyName.setWindowTitle("Error")
-            errorEmptyName.setIcon(QMessageBox.Critical)
-            errorEmptyName.setStandardButtons(QMessageBox.Ok)
-            errorEmptyName.setText('Cannot create new note - note name cannot be empty!')
-            errorEmptyName.show()
-    except Exception as exception:
-        errorNOCB5 = QMessageBox(mainApplicationWindow)
-        errorNOCB5.setWindowTitle("Error")
-        errorNOCB5.setIcon(QMessageBox.Critical)
-        errorNOCB5.setText(f"Try-catch error while creating new note!\n{exception}")
-        errorNOCB5.setStandardButtons(QMessageBox.Abort)
-        errorNOCB5.show()
-        
+    name, submit = QInputDialog.getText(mainApplicationWindow, "Create new note", "Enter new note name:")
+    if name != "" and submit:
+        notes[name] = {"text":"", "tags":[]}
+        listNotes.addItem(name)
+        with open("notes.json", "w", encoding="utf-8") as file:
+            json.dump(notes, file, sort_keys=True)
+    elif name in notes.keys():
+        errorDuplicate = QMessageBox(mainApplicationWindow)
+        errorDuplicate.setWindowTitle("Error")
+        errorDuplicate.setIcon(QMessageBox.Critical)
+        errorDuplicate.setStandardButtons(QMessageBox.Ok)
+        errorDuplicate.setText('Cannot create new note - note already exists!')
+        errorDuplicate.show()
+    else:
+        errorEmptyName = QMessageBox(mainApplicationWindow)
+        errorEmptyName.setWindowTitle("Error")
+        errorEmptyName.setIcon(QMessageBox.Critical)
+        errorEmptyName.setStandardButtons(QMessageBox.Ok)
+        errorEmptyName.setText('Cannot create new note - note name cannot be empty!')
+        errorEmptyName.show()
 
 def deleteNote():
     try:
@@ -131,64 +123,36 @@ def deleteNote():
                 with open("notes.json", "w", encoding="utf-8") as file:
                     json.dump(notes, file, sort_keys=True)
                     listNotes.addItems(notes.keys())
-    except Exception as exception:
+    except EOFError as e:
         errorNOCB4 = QMessageBox(mainApplicationWindow)
         errorNOCB4.setWindowTitle("Error")
         errorNOCB4.setIcon(QMessageBox.Critical)
-        errorNOCB4.setText(f"Try-catch error while deleting note!\n{exception}")
+        errorNOCB4.setText(e)
         errorNOCB4.setStandardButtons(QMessageBox.Abort)
         errorNOCB4.show()
 
 def readLicense():
-    if initialContents == licenseContents:
-        viewer.show()
-    else:
-        errorNOCB3 = QMessageBox(mainApplicationWindow)
-        errorNOCB3.setWindowTitle("Error")
-        errorNOCB3.setIcon(QMessageBox.Critical)
-        errorNOCB3.setText("The license has been modified.")
-        errorNOCB3.setStandardButtons(QMessageBox.Abort)
-        errorNOCB3.show()
-
-def closeAbout():
-    aboutviewer.hide()
+    try:
+        if licenseContents != initialContents:
+            errorNOCB3 = QMessageBox(mainApplicationWindow)
+            errorNOCB3.setWindowTitle("Error")
+            errorNOCB3.setIcon(QMessageBox.Critical)
+            errorNOCB3.setText("The license has been modified.")
+            errorNOCB3.setStandardButtons(QMessageBox.Abort)
+            errorNOCB3.show()
+        else:
+            viewer.show()
+    except:
+        errorLicense = QMessageBox(mainApplicationWindow)
+        errorLicense = QMessageBox(mainApplicationWindow)
+        errorLicense.setWindowTitle("Error")
+        errorLicense.setIcon(QMessageBox.Critical)
+        errorLicense.setText("The license cannot be read.")
+        errorLicense.setStandardButtons(QMessageBox.Abort)
+        errorLicense.show()
 
 def readAbout():
     aboutviewer.show()
-
-def deleteTag():
-    tag = listTags.selectedItems()[0].text()
-    key = listNotes.selectedItems()[0].text()
-    notes[key]["tags"].remove(tag)
-    with open("notes.json", "w", encoding="utf-8") as file:
-        json.dump(notes, file, sort_keys=True)
-    listTags.clear()
-    listTags.addItems(notes[key]["tags"])
-
-def createTag():
-    tag = searchTagLine.text()
-    key = listNotes.selectedItems()[0].text()
-    notes[key]["tags"].append(tag)
-    if tag in notes[key]["tags"]:
-        errorDupeTag = QMessageBox(mainApplicationWindow)
-        errorDupeTag.setWindowTitle("Error")
-        errorDupeTag.setIcon(QMessageBox.Critical)
-        errorDupeTag.setText("Cannot create new tag - tag already exists!")
-        errorDupeTag.setStandardButtons(QMessageBox.Abort)
-        errorDupeTag.show()
-    elif tag == "":
-        errorNameTag = QMessageBox(mainApplicationWindow)
-        errorNameTag.setWindowTitle("Error")
-        errorNameTag.setIcon(QMessageBox.Critical)
-        errorNameTag.setText("Cannot create new tag - tag name cannot be empty!")
-        errorNameTag.setStandardButtons(QMessageBox.Abort)
-        errorNameTag.show()
-    else:
-        with open("notes.json", "w", encoding="utf-8") as file:
-            json.dump(notes, file, sort_keys=True)
-        listTags.clear()
-        listTags.addItems(notes[key]["tags"])
-        searchTagLine.clear()
 
 listNotesLabel = QLabel('Your notes:')
 listNotes = QListWidget()
@@ -228,9 +192,6 @@ saveAction.triggered.connect(saveNote)
 deleteAction.triggered.connect(deleteNote)
 helpAction.triggered.connect(application.quit)
 exitAction.triggered.connect(application.quit)
-
-newTagAction.triggered.connect(createTag)
-deleteTagAction.triggered.connect(deleteTag)
 
 aboutAction.triggered.connect(readAbout)
 licenseAction.triggered.connect(readLicense)
@@ -314,8 +275,6 @@ saveNoteButton.clicked.connect(saveNote)
 newNoteButton.clicked.connect(newNote)
 deleteNoteButton.clicked.connect(deleteNote)
 searchTagButton.clicked.connect(searchTag)
-deleteTagButton.clicked.connect(deleteTag)
-createTagButton.clicked.connect(createTag)
 searchTagLine.setPlaceholderText("Search tag (e. g. 'shopping', 'tutorial', 'important')")
 mainApplicationWindow.show()
 application.exec_()
