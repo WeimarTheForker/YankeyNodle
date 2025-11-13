@@ -18,7 +18,6 @@ from PyQt5.QtWidgets import (
 from PyQt5 import QtGui
 import json
 import hashlib
-from hashlib import sha256
 
 checksum = "fbae9aa1ae71700fbddc7f313897161b0941ec24144755143d43138db9a121cb"
 
@@ -35,12 +34,12 @@ with open("initial.txt", "r", encoding="utf-8") as file:
     initialContents = file.read()
 
 currentChecksum = hashlib.sha256(licenseContents.encode()).hexdigest()
-print(currentChecksum)
+print("Current LICENSE checksum:", currentChecksum)
 
 application = QApplication([])
 mainApplicationWindow = QWidget()
 mainApplicationWindow.resize(1200, 700)
-mainApplicationWindow.setWindowTitle('Yankey Nodle')
+mainApplicationWindow.setWindowTitle('Yankey Nodle v0.9.1')
 mainApplicationWindow.setWindowIcon(QtGui.QIcon('logo.png'))
 
 viewer = QWidget()
@@ -84,7 +83,12 @@ def saveNote():
         with open("notes.json", "w", encoding="utf-8") as file:
             json.dump(notes, file, sort_keys=True)
     except:
-        print("Save failed!")
+        errorNOCB4 = QMessageBox(mainApplicationWindow)
+        errorNOCB4.setWindowTitle("Error")
+        errorNOCB4.setIcon(QMessageBox.Critical)
+        errorNOCB4.setText("Save failed!")
+        errorNOCB4.setStandardButtons(QMessageBox.Abort)
+        errorNOCB4.show()
 
 def newNote():
     name, submit = QInputDialog.getText(mainApplicationWindow, "Create new note", "Enter new note name:")
